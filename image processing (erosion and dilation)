@@ -1,0 +1,186 @@
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+img= cv2.imread("Particles.png",0)
+img
+array([[217, 222, 220, ..., 212, 219, 221],
+       [217, 220, 217, ..., 214, 220, 221],
+       [216, 217, 217, ..., 212, 217, 218],
+       ...,
+       [ 90,  88,  90, ..., 234, 235, 235],
+       [ 91,  90,  91, ..., 231, 232, 233],
+       [ 93,  91,  87, ..., 228, 229, 232]], dtype=uint8)
+height, width = img.shape[0], img.shape[1]
+img_A = np.zeros_like(img)
+img_A.shape #check the shape of img_A is same as img or not  
+(320, 394)
+img_padded = cv2.copyMakeBorder(img, 1,1,1,1, cv2.BORDER_CONSTANT, value=0)
+img_padded.shape
+(322, 396)
+img_padded
+array([[  0,   0,   0, ...,   0,   0,   0],
+       [  0, 217, 222, ..., 219, 221,   0],
+       [  0, 217, 220, ..., 220, 221,   0],
+       ...,
+       [  0,  91,  90, ..., 232, 233,   0],
+       [  0,  93,  91, ..., 229, 232,   0],
+       [  0,   0,   0, ...,   0,   0,   0]], dtype=uint8)
+N = 3
+one_mask = np.ones([N, N])
+central = (N+1)//2 -1
+one_mask[central, central] = 0
+img_padded = cv2.copyMakeBorder(img, central,central,central,central, cv2.BORDER_CONSTANT, value=0)
+#max-filter
+for r in range(central, height+ central):
+    for c in range(central, width + central):
+        neighbourhood = img_padded[r-central:r+central+1, c-central:c+central+1] * one_mask
+        img_A[r-central,c-central] = np.max(neighbourhood)
+plt.imshow(img_A,"gray")
+<matplotlib.image.AxesImage at 0x19c842694a8>
+
+N = 11
+one_mask = np.ones([N, N])
+central = (N+1)//2 -1
+one_mask[central, central] = 0
+img_padded = cv2.copyMakeBorder(img, central,central,central,central, cv2.BORDER_CONSTANT, value=0)
+#max-filtered
+for r in range(central, height+ central):
+    for c in range(central, width + central):
+        neighbourhood = img_padded[r-central:r+central+1, c-central:c+central+1] * one_mask
+        img_A[r-central,c-central] = np.max(neighbourhood)
+plt.imshow(img_A,"gray")
+<matplotlib.image.AxesImage at 0x19c882d5240>
+
+kernel = np.ones((5,5),np.uint8)
+kernel2 = np.ones((7,7),np.uint8)
+kernel3 = np.ones((13,13),np.uint8)
+img_min1 = cv2.erode(img_padded,kernel,iterations = 1 )
+img_min2 = cv2.erode(img_padded, kernel2, iterations=1)  
+img_min3 = cv2.erode(img_padded, kernel3, iterations=1)  
+cv2.imshow("inout",img_padded)
+cv2.imshow('min',img_min1)
+cv2.imshow("max",img_min2)
+cv2.imshow("ma",img_min3)
+cv2.waitKey(0)
+-1
+img_B=np.zeros_like(img) 
+img_A_padded = cv2.copyMakeBorder(img_A, central,central,central,central, cv2.BORDER_CONSTANT, value=0)
+#min-filtered
+for r in range(central, height + central):
+    for c in range(central, width + central):
+        neighbourhood = img_A_padded[r-central:r+central+1, c-central:c+central+1] * one_mask
+        neighbourhood[central,central] = 255
+        img_B[r-central][c-central] = np.min(neighbourhood)
+img_B
+array([[0, 0, 0, ..., 0, 0, 0],
+       [0, 0, 0, ..., 0, 0, 0],
+       [0, 0, 0, ..., 0, 0, 0],
+       ...,
+       [0, 0, 0, ..., 0, 0, 0],
+       [0, 0, 0, ..., 0, 0, 0],
+       [0, 0, 0, ..., 0, 0, 0]], dtype=uint8)
+plt.imshow(img_B, 'gray')
+<matplotlib.image.AxesImage at 0x19c883f9be0>
+
+N = 11
+one_mask = np.ones([N, N])
+central = (N+1)//2 -1
+img_padded = cv2.copyMakeBorder(img, central,central,central,central, cv2.BORDER_CONSTANT, value=0)
+#min-filtered
+for r in range(central, height + central):
+    for c in range(central, width + central):
+        neighbourhood = img_padded[r-central:r+central+1, c-central:c+central+1] * one_mask
+        neighbourhood[central,central] = 255
+        img_B[r-central][c-central] = np.min(neighbourhood)
+plt.imshow(img_B, 'gray')
+<matplotlib.image.AxesImage at 0x19c8832eeb8>
+
+img_Output = np.zeros_like(img)
+for c in range(width):
+    for r in range(height):
+        img_Output[r,c]= img[r,c].astype('int16') - img_B[r,c].astype('int16')
+        if img_Output[r,c]<=0:
+            img_Output[r,c]+=255
+​
+img_Output_result = np.uint8(img_Output)
+plt.imshow(img_Output_result, 'gray')
+<matplotlib.image.AxesImage at 0x19c896e8828>
+
+def read_image(path):
+    img = cv2.imread(path, 0)
+    return img
+read_image('Cells.png')
+plt.imshow(read_image("Cells.png"))
+<matplotlib.image.AxesImage at 0x19c89a8a0f0>
+
+def min_filter(img, N):
+    height, width = img.shape
+    img_A = np.zeros_like(img)
+    one_mask = np.ones([N, N])
+    central = (N+1)//2 -1
+    one_mask[central, central] = 0
+    img_padded = cv2.copyMakeBorder(img, central,central,central,central, cv2.BORDER_CONSTANT, value=0)    #min-filtered
+    for r in range(central, height + central):
+        for c in range(central, width + central):
+            neighbourhood = img_padded[r-central:r+central+1, c-central:c+central+1] * one_mask
+            neighbourhood[central,central] = 255
+            img_B[r-central][c-central] = np.min(neighbourhood)
+    return img_A
+img_A = min_filter(img,17)
+plt.imshow(img_A,'gray')
+<matplotlib.image.AxesImage at 0x19c90c47780>
+
+​
+<matplotlib.image.AxesImage at 0x19c8d343588>
+
+def max_filter(img, N):
+    height, width = img.shape
+    img_B = np.zeros_like(img)
+    one_mask = np.ones([N, N])
+    central = (N+1)//2 -1
+    one_mask[central, central] = 0
+    img_padded = cv2.copyMakeBorder(img, central,central,central,central, cv2.BORDER_CONSTANT, value=0)    #min-filtered
+    for r in range(central, height + central):
+        for c in range(central, width + central):
+            neighbourhood = img_padded[r-central:r+central+1, c-central:c+central+1] * one_mask
+            neighbourhood[central,central] = 255
+            img_B[r-central][c-central] = np.min(neighbourhood)
+    return img_B
+img_B = max_filter(img_A,17)
+plt.imshow(img_B,'gray')
+<matplotlib.image.AxesImage at 0x19c90bf29e8>
+
+def img_subtract(img_1, img_2):
+    img_O = np.zeros_like(img_1)
+    height, width = img_1.shape
+    for r in range(height):
+        for c in range(width):
+            img_O[r, c] = img_1[r, c].astype("int32") - img_2[r, c].astype("int32")
+            if img_O[r, c]<=0:
+                img_O[r, c] += 255
+    return img_O
+img_O = img_subtract(img,img_B)
+img_O_final = np.uint8(img_O)
+plt.imshow(img_O_final,'gray')
+<matplotlib.image.AxesImage at 0x19c8f9951d0>
+
+def choose(M,img,N):
+    if M == 0:
+        img_A = max_filter(img,N)
+        img_B = min_filter(img_A,N)
+        img_O = img_subtract(img , img_B) 
+        img_O_final = np.uint8(img_O)
+        plt.imshow(img_O_final,'gray')
+    if M == 1:
+        img_A = min_filter(img,N)
+        img_B = max_filter(img_A,N)
+        img_O = img_subtract(img , img_B) 
+        img_O_final = np.uint8(img_O)
+        plt.imshow(img_O_final,'gray')
+    
+choose(0,img,9)
+
+%pwd
