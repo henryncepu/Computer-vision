@@ -1,0 +1,32 @@
+import matplotlib.pyplot as plt
+import cv2
+import numpy as np
+img = cv2.imread("cat.png",0)
+def test1(img):
+    a =0
+    b =255
+    c = np.min(img)
+    d = np.max(img)
+    
+    output = (img-c)*((b-a)/(d-c)) + a
+    result = np.uint8(output)
+    #plt.imshow(output)
+    cv2.imshow('re',result)
+    cv2.waitKey(0)# is used to introduce a delay of n milliseconds while rendering images to windows
+test1(img)
+img_L1 = cv2.GaussianBlur(img, (3,3), 5)
+plt.imshow(img_L1, 'gray')
+<matplotlib.image.AxesImage at 0x2b29f89bda0>
+
+img_L2 = cv2.GaussianBlur(img, (3,3), 1)
+plt.imshow(img_L2, 'gray')
+img_H = img - img_L2
+plt.imshow(img_H, 'gray')
+a = 1.25
+img_O = (img_H*a) + img
+img_O_result = np.uint8(img_O)
+plt.imshow(img_O,'gray')
+a = 1.25
+img_O = (img_H*a) + img
+img_O_result = np.uint8(img_O)
+plt.imshow(img_O_result,'gray')
