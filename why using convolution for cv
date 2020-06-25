@@ -1,0 +1,32 @@
+CNN (convolution neural network)
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+
+#read image
+img_src = cv2.imread('Cells.png')
+*****************the only difference between is when u change the matrix size , the light level will be different   
+#prepare the 3x3 shaped filter
+kernel = np.array([[1, 1, 1], 
+                   [1, 1, 1], 
+                   [1, 1, 1], 
+                   ])
+kernel = kernel/sum(kernel)
+
+#filter the source image
+img_rst = cv2.filter2D(img_src,-1,kernel)
+
+
+#save result image
+#cv2.imwrite('result.jpg',img_rst)
+
+#prepare the 4x4 shaped filter
+kernel2 = np.array([[-4, -3, -4,4], 
+                   [-4, 1, -4,2], 
+                   [-4, -3, -4,3], 
+                   [-4, -3, -4,2], 
+                   ])
+kernel2 = kernel2/sum(kernel2)
+
+#filter the source image
+img_rst2 = cv2.filter2D(img_src,-1,kernel2)
